@@ -1,12 +1,16 @@
 #pragma once
 
 #include <atomic>
+#include <memory>
 #include <stdexcept>
-#include <vector>
 namespace vita {
 
 /**
- * align to 64 bytes for avoid false sharing cacheline
+ * Vyukov's bounded MPMC Queue implementation
+ * Align to 64 bytes for avoiding false sharing cacheline
+ * @tparam T the type of the data to be stored in the queue
+ * @param capacity the capacity of the queue
+ * @return the MPMCQueue instance
  */
 template <typename T>
 class MPMCQueue {
@@ -14,7 +18,7 @@ private:
     alignas(64) struct slot {
         T *data;
         std::atomic<size_t> seq;
-        slot() : seq(0) {}
+        slot() : data(nullptr), seq(0) {}
     };
     size_t cap_, mask_;
     std::unique_ptr<slot[]> slots_;
@@ -40,13 +44,14 @@ public:
         while (true) {
             auto &node = slots_[idx & mask_];
             size_t seq = node.seq.load(std::memory_order_acquire);
-            if (seq == idx) {
+            intptr_t diff = static_cast<intptr_t>(seq - idx);
+            if (diff == 0) {
                 if (tail_.compare_exchange_weak(idx, idx + 1, std::memory_order_relaxed)) {
                     node.data = data;
                     node.seq.store(idx + 1, std::memory_order_release);
                     return true;
                 }
-            } else if (seq < idx) {
+            } else if (diff < 0) {
                 return false;
             } else {
                 idx = tail_.load(std::memory_order_relaxed);
@@ -58,13 +63,14 @@ public:
         while (true) {
             auto &node = slots_[idx & mask_];
             size_t seq = node.seq.load(std::memory_order_acquire);
-            if (seq == idx + 1) {
+            intptr_t diff = static_cast<intptr_t>(seq - (idx + 1));
+            if (diff == 0) {
                 if (head_.compare_exchange_weak(idx, idx + 1, std::memory_order_relaxed)) {
                     auto res = node.data;
                     node.seq.store(idx + cap_, std::memory_order_release);
                     return res;
                 }
-            } else if (seq < idx + 1) {
+            } else if (diff < 0) {
                 return nullptr;
             } else {
                 idx = head_.load(std::memory_order_relaxed);
