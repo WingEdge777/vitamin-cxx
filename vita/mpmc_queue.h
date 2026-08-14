@@ -15,7 +15,7 @@ namespace vita {
 template <typename T>
 class MPMCQueue {
 private:
-    alignas(64) struct slot {
+    struct alignas(64) slot {
         T *data;
         std::atomic<size_t> seq;
         slot() : data(nullptr), seq(0) {}
