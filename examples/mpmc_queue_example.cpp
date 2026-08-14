@@ -31,7 +31,7 @@ int main() {
         producers.emplace_back([&queue, &produced, p] {
             for (std::size_t i = 0; i < kPerProducer; ++i) {
                 auto *value = new int(static_cast<int>(p * static_cast<int>(kPerProducer) + static_cast<int>(i)));
-                while (!queue.put(value)) {
+                while (!queue.try_put(value)) {
                     std::this_thread::yield();
                 }
                 produced.fetch_add(1, std::memory_order_relaxed);
@@ -45,7 +45,7 @@ int main() {
         (void)c;
         consumers.emplace_back([&queue, &consumed] {
             while (consumed.load(std::memory_order_acquire) < kExpected) {
-                int *value = queue.get();
+                int *value = queue.try_get();
                 if (value == nullptr) {
                     std::this_thread::yield();
                     continue;

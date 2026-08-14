@@ -38,7 +38,7 @@ public:
     }
     MPMCQueue(const MPMCQueue &) = delete;
     MPMCQueue &operator=(const MPMCQueue &) = delete;
-    bool put(T *data) {
+    bool try_put(T *data) {
         size_t idx = tail_.load(std::memory_order_relaxed);
 
         while (true) {
@@ -58,7 +58,7 @@ public:
             }
         }
     }
-    T *get() {
+    T *try_get() {
         size_t idx = head_.load(std::memory_order_relaxed);
         while (true) {
             auto &node = slots_[idx & mask_];
