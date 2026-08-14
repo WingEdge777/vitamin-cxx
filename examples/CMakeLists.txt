@@ -1,4 +1,4 @@
 find_package(Threads REQUIRED)
 
-add_executable(mpmc_queue_example mpmc_queue_example.cpp)
-target_link_libraries(mpmc_queue_example PRIVATE vitamin_cxx Threads::Threads)
+add_executable(lockfree_queue_example lockfree_queue_example.cpp)
+target_link_libraries(lockfree_queue_example PRIVATE vitamin_cxx Threads::Threads)

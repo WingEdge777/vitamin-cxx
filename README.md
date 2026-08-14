@@ -12,7 +12,7 @@ Build examples:
 
 ```bash
 ./build.sh --examples
-./build/examples/mpmc_queue_example
+./build/examples/lockfree_queue_example
 ```
 
 Link the library from another CMake target with `vitamin_cxx` only:
