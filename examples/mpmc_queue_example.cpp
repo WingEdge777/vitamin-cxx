@@ -1,7 +1,9 @@
 #include "vita/mpmc_queue.h"
 
 #include <atomic>
+#include <chrono>
 #include <cstddef>
+#include <iomanip>
 #include <iostream>
 #include <thread>
 #include <vector>
@@ -20,6 +22,8 @@ int main() {
     vita::MPMCQueue<int> queue(kCapacity);
     std::atomic<std::size_t> produced{0};
     std::atomic<std::size_t> consumed{0};
+
+    const auto t0 = std::chrono::steady_clock::now();
 
     std::vector<std::thread> producers;
     producers.reserve(static_cast<std::size_t>(kProducers));
@@ -59,9 +63,15 @@ int main() {
         t.join();
     }
 
+    const auto t1 = std::chrono::steady_clock::now();
+    const auto elapsed_ms = std::chrono::duration<double, std::milli>(t1 - t0).count();
+
     const std::size_t produced_total = produced.load();
     const std::size_t consumed_total = consumed.load();
-    std::cout << "produced=" << produced_total << " consumed=" << consumed_total << '\n';
+    const double ops_per_sec = elapsed_ms > 0.0 ? (static_cast<double>(consumed_total) * 1000.0 / elapsed_ms) : 0.0;
+
+    std::cout << "produced=" << produced_total << " consumed=" << consumed_total << " elapsed_ms=" << std::fixed
+              << std::setprecision(3) << elapsed_ms << " ops_per_sec=" << std::setprecision(0) << ops_per_sec << '\n';
 
     if (produced_total != kExpected || consumed_total != kExpected) {
         return 1;
