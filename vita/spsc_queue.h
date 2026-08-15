@@ -15,14 +15,6 @@ namespace vita {
  */
 template <typename T>
 class SPSCQueue {
-private:
-    size_t cap_, mask_;
-    std::vector<T *> buffer_;
-    alignas(64) std::atomic<size_t> head_;
-    size_t cached_tail_;
-    alignas(64) std::atomic<size_t> tail_;
-    size_t cached_head_;
-
 public:
     explicit SPSCQueue(size_t capacity) : cap_(capacity), head_(0), cached_tail_(0), tail_(0), cached_head_(0) {
         if (capacity < 1 || (capacity & (capacity - 1)) != 0) {
@@ -60,6 +52,14 @@ public:
         head_.store(h + 1, std::memory_order_release);
         return res;
     }
+
+private:
+    size_t cap_, mask_;
+    std::vector<T *> buffer_;
+    alignas(64) std::atomic<size_t> head_;
+    size_t cached_tail_;
+    alignas(64) std::atomic<size_t> tail_;
+    size_t cached_head_;
 };
 
 } // namespace vita

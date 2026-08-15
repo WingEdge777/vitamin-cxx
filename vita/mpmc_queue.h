@@ -14,17 +14,6 @@ namespace vita {
  */
 template <typename T>
 class MPMCQueue {
-private:
-    struct slot {
-        T *data;
-        std::atomic<size_t> seq;
-        slot() : data(nullptr), seq(0) {}
-    };
-    size_t cap_, mask_;
-    std::unique_ptr<slot[]> slots_;
-    alignas(64) std::atomic<size_t> head_;
-    alignas(64) std::atomic<size_t> tail_;
-
 public:
     explicit MPMCQueue(size_t capacity) : cap_(capacity), head_(0), tail_(0) {
         if (capacity < 2 || (capacity & (capacity - 1)) != 0) {
@@ -77,6 +66,17 @@ public:
             }
         }
     }
+
+private:
+    struct slot {
+        T *data;
+        std::atomic<size_t> seq;
+        slot() : data(nullptr), seq(0) {}
+    };
+    size_t cap_, mask_;
+    std::unique_ptr<slot[]> slots_;
+    alignas(64) std::atomic<size_t> head_;
+    alignas(64) std::atomic<size_t> tail_;
 };
 
 } // namespace vita
