@@ -3,7 +3,6 @@
 #include <condition_variable>
 #include <functional>
 #include <future>
-#include <iostream>
 #include <mutex>
 #include <queue>
 #include <thread>
@@ -12,7 +11,7 @@
 
 class ThreadPool {
 public:
-    explicit ThreadPool(int threads = 8) : stop_(false) {
+    explicit ThreadPool(size_t threads = 8) : stop_(false) {
         for (int i = 0; i < threads; i++) {
             workers_.emplace_back([this] {
                 for (;;) {
@@ -43,7 +42,7 @@ public:
         {
             std::lock_guard<std::mutex> lock(mtx_);
             if (stop_) {
-                std::cerr << "enqueue on stopped ThreadPool\n";
+                throw std::runtime_error("enqueue on stopped ThreadPool");
             }
             tasks_.emplace([task] { (*task)(); });
         }
