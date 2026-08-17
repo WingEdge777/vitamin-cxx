@@ -9,6 +9,7 @@
 #include <tuple>
 #include <vector>
 
+namespace vita {
 class ThreadPool {
 public:
     explicit ThreadPool(size_t threads = 8) : stop_(false) {
@@ -74,3 +75,5 @@ private:
     std::condition_variable cv_;
     bool stop_;
 };
+
+} // namespace vita

@@ -2,3 +2,6 @@ find_package(Threads REQUIRED)
 
 add_executable(lockfree_queue_example lockfree_queue_example.cpp)
 target_link_libraries(lockfree_queue_example PRIVATE vitamin_cxx Threads::Threads)
+
+add_executable(thread_pool_example thread_pool_example.cpp)
+target_link_libraries(thread_pool_example PRIVATE vitamin_cxx Threads::Threads)
