@@ -5,3 +5,6 @@ target_link_libraries(lockfree_queue_example PRIVATE vitamin_cxx Threads::Thread
 
 add_executable(thread_pool_example thread_pool_example.cpp)
 target_link_libraries(thread_pool_example PRIVATE vitamin_cxx Threads::Threads)
+
+add_executable(object_pool_example object_pool_example.cpp)
+target_link_libraries(object_pool_example PRIVATE vitamin_cxx Threads::Threads)

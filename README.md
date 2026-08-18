@@ -14,6 +14,7 @@ Build examples:
 bash build.sh
 ./build/examples/lockfree_queue_example
 ./build/examples/thread_pool_example
+./build/examples/object_pool_example
 ```
 
 Link the library from another CMake target with `vitamin_cxx` only:
