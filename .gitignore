@@ -6,7 +6,7 @@
 build
 *.whl
 tmp
-*.ncu-rep
+todo.md
 test_.py
 __pycache__/
 data/
