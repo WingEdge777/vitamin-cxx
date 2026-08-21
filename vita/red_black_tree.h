@@ -20,6 +20,12 @@ public:
     }
 
     template <typename F>
+    void pre_order(F callback) {}
+
+    template <typename F>
+    void in_order(F callback) {}
+
+    template <typename F>
     void post_order(F callback) {}
 
 private:
