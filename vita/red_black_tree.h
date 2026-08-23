@@ -29,6 +29,8 @@ public:
     void post_order(F callback) {}
 
 private:
+    size_t size(const Node *p) { return p ? p->sz : 0; }
+    bool is_red(const Node *p) { return p ? p->red : false; }
     Node *root;
     const compare_t compare;
 };
