@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <functional>
 
+namespace vita {
 template <typename key_t, typename compare_t = std::less<key_t>>
 struct RedBlackTree {
 public:
@@ -34,3 +35,5 @@ private:
     Node *root;
     const compare_t compare;
 };
+
+} // namespace vita
