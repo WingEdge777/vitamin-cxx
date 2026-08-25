@@ -13,25 +13,108 @@ public:
         key_t data;
         size_t sz;
         bool red;
-        bool is_right_child() { return this == fa->ch[1]; }
+        bool child_dir() { return this == fa->ch[1]; }
     };
     RedBlackTree() : compare{}, root{nullptr} {}
     ~RedBlackTree() {
         post_order([](auto it) { delete it; });
     }
 
+    // 前/中/后序遍历
     template <typename F>
-    void pre_order(F callback) {}
+    void pre_order(F callback) {
+        auto f = [&](auto &&f, Node *p) {
+            if (!p) return;
+            callback(p), f(f, p->ch[0]), f(f, p->ch[1]);
+        };
+        f(f, root);
+    }
 
     template <typename F>
-    void in_order(F callback) {}
+    void in_order(F callback) {
+        auto f = [&](auto &&f, Node *p) {
+            if (!p) return;
+            f(f, p->ch[0]), callback(p), f(f, p->ch[1]);
+        };
+        f(f, root);
+    }
 
     template <typename F>
-    void post_order(F callback) {}
+    void post_order(F callback) {
+        auto f = [&](auto &&f, Node *p) {
+            if (!p) return;
+            f(f, p->ch[0]), f(f, p->ch[1]), callback(p);
+        };
+        f(f, root);
+    }
+    Node *leftmost(const Node *p) { return most(p, 0); }
+    Node *rightmost(const Node *p) { return most(p, 1); }
+    Node *prev(const Node *p) { return neighbour(p, 0); }
+    Node *next(const Node *p) { return neighbour(p, 1); }
+    Node *lower_bound(const key_t &key) {
+        Node *now = root, *ans = nullptr;
+        while (now) {
+            if (!compare(now->data, key))
+                ans = now, now = now->ch[0];
+            else
+                now = now->ch[1];
+        }
+        return ans;
+    }
+    Node *uppper_bound(const key_t &key) {
+        Node *now = root, *ans = nullptr;
+        while (now) {
+            if (compare(key, now->data))
+                ans = now, now = now->ch[0];
+            else
+                now = now->ch[1];
+        }
+        return ans;
+    }
+    // start from 0
+    size_t order_of_key(const key_t &key) {
+        size_t ans = 0;
+        auto now = root;
+        while (now) {
+            if (!compare(now->data, key))
+                now = now->ch[0];
+            else {
+                ans += size(now->ch[0]) + 1;
+                now = now->ch[1];
+            }
+        }
+        return ans;
+    }
+    Node *find_by_order(size_t order) {
+        Node *now = root, *ans = nullptr;
+        while (now && now->sz >= order) {
+            auto lsz = size(now->ch[0]);
+            if (order < lsz)
+                now = now->ch[0];
+            else {
+                ans = now;
+                if (order == lsz) break;
+                now = now->ch[1];
+                order -= lsz + 1;
+            }
+        }
+    }
 
 private:
     size_t size(const Node *p) { return p ? p->sz : 0; }
     bool is_red(const Node *p) { return p ? p->red : false; }
+    Node *most(const node *p, bool dir) {
+        if (!p) return nullptr;
+        while (p->ch[dir]) p = p->ch[dir];
+        return p;
+    }
+    Node *neighbour(const node *p, bool dir) {
+        if (!p) return nullptr;
+        if (p->ch[dir]) return most(p->ch[dir], !dir); // 非叶子节点：左/右子树的最右/左子节点
+        if (p == root) return nullptr;
+        while (p && p->fa && p->child_dir() == dir) p = p->fa; // 叶子节点
+        return p ? p->fa : nullptr;
+    }
     Node *root;
     const compare_t compare;
 };

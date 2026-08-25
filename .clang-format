@@ -17,3 +17,5 @@ IndentCaseLabels: true
 IndentCaseBlocks: false
 
 AllowShortCaseLabelsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
