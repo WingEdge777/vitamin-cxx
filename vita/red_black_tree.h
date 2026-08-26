@@ -116,7 +116,7 @@ public:
     }
     bool erase(const key_t &key) {
         auto p = lower_bound(key);
-        if (!p || !compare(p->data, key) && !compare(key, p->data)) return false;
+        if (!p || compare(p->data, key) && compare(key, p->data)) return false;
         erase(p);
         return true;
     }
@@ -138,12 +138,12 @@ public:
 private:
     size_t size(const Node *p) { return p ? p->sz : 0; }
     bool is_red(const Node *p) { return p ? p->red : false; }
-    Node *most(const Node *p, bool dir) {
+    Node *most(Node *p, bool dir) {
         if (!p) return nullptr;
         while (p->ch[dir]) p = p->ch[dir];
         return p;
     }
-    Node *neighbour(const Node *p, bool dir) {
+    Node *neighbour(Node *p, bool dir) {
         if (!p) return nullptr;
         if (p->ch[dir]) return most(p->ch[dir], !dir); // 非叶子节点：左/右子树的最右/左子节点
         if (p == root) return nullptr;
