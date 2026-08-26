@@ -88,6 +88,7 @@ public:
         return ans;
     }
     Node *find_by_order(size_t order) {
+        if (size(root) > order) return nullptr;
         Node *now = root, *ans = nullptr;
         while (now && now->sz >= order) {
             auto lsz = size(now->ch[0]);
